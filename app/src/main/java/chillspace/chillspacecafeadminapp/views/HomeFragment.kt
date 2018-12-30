@@ -17,11 +17,14 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.fragment_home.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import chillspace.chillspacecafeadminapp.models.CompletedTransaction
+import chillspace.chillspacecafeadminapp.models.GeneratedOTP
 
 class HomeFragment : Fragment() {
 
     private val dbRef = FirebaseDatabase.getInstance().reference
     var otpList = ArrayList<Int>()
+    val PER_MINUTE_COST : Int = 1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -53,17 +56,28 @@ class HomeFragment : Fragment() {
                 }
 
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val uid = dataSnapshot.child("uid").getValue(String::class.java)
-                    val startTime = dataSnapshot.child("startTime").getValue(Long::class.java)
+                    val generatedOTP = dataSnapshot.getValue(GeneratedOTP::class.java)
 
-                    val currTransac = CurrentTransaction(true,uid,startTime)
+                    if(!generatedOTP?.isRunning!!){
+                        val currTransac = CurrentTransaction(true,generatedOTP.uid,generatedOTP.startTime)
 
-                    dbRef.child("CurrentTransaction").child(uid!!).setValue(currTransac)
+                        dbRef.child("CurrentTransactions").child(generatedOTP.uid!!).setValue(currTransac)
+                    }else{
+                        val playTimeInMinutes : Int  = (generatedOTP.playTime!! /60000).toInt()
+                        val cost = playTimeInMinutes*PER_MINUTE_COST
+                        val completedTransaction = CompletedTransaction(generatedOTP.uid,generatedOTP.startTime,playTimeInMinutes,cost)
+
+                        dbRef.child("CompletedTransactions").child(generatedOTP.uid!!).push().setValue(completedTransaction).addOnSuccessListener {
+                            dbRef.child("CurrentTransactions").child(generatedOTP.uid!!).removeValue()
+                        }
+                        txt_Payment.text = cost.toString()
+                    }
 
                     //removing otp from db
                     dbRef.child("GeneratedOTPs").child(edit_otp_home.text.toString()).removeValue()
                     otpList.remove(Integer.parseInt(otp))
                     dbRef.child("OTP_List").setValue(otpList)
+                    edit_otp_home.setText("")
                 }
             })
 
