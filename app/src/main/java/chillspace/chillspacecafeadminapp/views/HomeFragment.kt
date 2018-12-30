@@ -24,7 +24,10 @@ class HomeFragment : Fragment() {
 
     private val dbRef = FirebaseDatabase.getInstance().reference
     var otpList = ArrayList<Int>()
-    val PER_MINUTE_COST : Int = 1
+
+    val COST_PER_QUARTERHOUR : Int = 15
+    val COST_PER_HALFHOUR : Int = 20
+    val COST_PER_HOUR : Int = 40
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -64,7 +67,7 @@ class HomeFragment : Fragment() {
                         dbRef.child("CurrentTransactions").child(generatedOTP.uid!!).setValue(currTransac)
                     }else{
                         val playTimeInMinutes : Int  = (generatedOTP.playTime!! /60000).toInt()
-                        val cost = playTimeInMinutes*PER_MINUTE_COST
+                        val cost = costCalculator(playTimeInMinutes)
                         val completedTransaction = CompletedTransaction(generatedOTP.uid,generatedOTP.startTime,playTimeInMinutes,cost)
 
                         dbRef.child("CompletedTransactions").child(generatedOTP.uid!!).push().setValue(completedTransaction).addOnSuccessListener {
@@ -83,4 +86,29 @@ class HomeFragment : Fragment() {
 
         }
     }
+
+    private fun costCalculator(playTimeInMinutes: Int): Int? {
+        var cost : Int = 0
+
+        val hours = playTimeInMinutes/60
+        val halfHours = (playTimeInMinutes-(hours*60))/30
+        val quarterHours = (playTimeInMinutes - (hours*60) - (halfHours*30))/15
+        val leftMinutes = (playTimeInMinutes - (hours*60) - (halfHours*30) - (quarterHours*15))
+
+        return if(playTimeInMinutes<15){
+            cost = 15
+
+            cost
+        }else{
+            cost = hours*COST_PER_HOUR + halfHours*COST_PER_HALFHOUR + quarterHours*COST_PER_QUARTERHOUR
+            when{
+                leftMinutes<=5 -> cost += 0
+                leftMinutes>5 -> cost += 15
+            }
+
+            cost
+        }
+    }
+
+
 }
