@@ -1,7 +1,8 @@
-package chillspace.chillspacecafeadminapp
+package chillspace.chillspacecafeadminapp.views
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import chillspace.chillspacecafeadminapp.R
 
 class MainActivity : AppCompatActivity() {
 
