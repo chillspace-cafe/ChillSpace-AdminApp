@@ -48,47 +48,58 @@ class HomeFragment : Fragment() {
 
             val otp = edit_otp_home.text.toString()
 
-            dbRef.child("GeneratedOTPs").child(otp)
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onCancelled(p0: DatabaseError) {
-                            Toast.makeText(activity, "No OTP found.", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            val generatedOTP = dataSnapshot.getValue(GeneratedOTP::class.java)
-
-                            if (!generatedOTP?.isRunning!!) {
-                                val currTransaction = CurrentTransactionAdminSide(true, generatedOTP.uid, ServerValue.TIMESTAMP)
-
-                                dbRef.child("Current").child("CurrentTransactions").child(generatedOTP.uid!!).setValue(currTransaction)
-                            } else {
-                                calculateTimeDetails(generatedOTP.uid, object : CallbackInterface<Array<Long>> {
-                                    override fun callback(data: Array<Long>) {
-                                        val playTimeInMinutes: Int = ((data[1] - data[0]) / 60000).toInt()
-                                        val cost = costCalculator(playTimeInMinutes)
-                                        val completedTransaction = CompletedTransaction(generatedOTP.uid, data[0], playTimeInMinutes, cost)
-
-                                        dbRef.child("CompletedTransactions").child(generatedOTP.uid!!).push().setValue(completedTransaction).addOnSuccessListener {
-                                            dbRef.child("Current").child("CurrentTransactions").child(generatedOTP.uid!!).child("active").setValue(false)
-                                        }
-                                        txt_Payment.text = cost.toString()
-                                    }
-                                })
+            //handle wrong otp
+            if (otp.length != 4) {
+                Toast.makeText(activity, "Enter a valid OTP.", Toast.LENGTH_SHORT).show()
+            } else {
+                dbRef.child("GeneratedOTPs")
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onCancelled(p0: DatabaseError) {
+                                Toast.makeText(activity, "No OTP found.", Toast.LENGTH_SHORT).show()
                             }
 
-                            //removing otp from db
-                            dbRef.child("GeneratedOTPs").child(edit_otp_home.text.toString()).removeValue()
-                            otpList.remove(Integer.parseInt(otp))
-                            dbRef.child("OTP_List").setValue(otpList)
-                            edit_otp_home.setText("")
-                        }
-                    })
+                            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                if (dataSnapshot.hasChild(otp)) {
+                                    val snapshot = dataSnapshot.child(otp)
+
+                                    val generatedOTP = snapshot.getValue(GeneratedOTP::class.java)
+
+                                    if (!generatedOTP?.isRunning!!) {
+                                        val currTransaction = CurrentTransactionAdminSide(true, generatedOTP.uid, ServerValue.TIMESTAMP)
+
+                                        dbRef.child("Current").child("CurrentTransactions").child(generatedOTP.uid!!).setValue(currTransaction)
+                                    } else {
+                                        calculateTimeDetails(generatedOTP.uid, object : CallbackInterface<Array<Long>> {
+                                            override fun callback(data: Array<Long>) {
+                                                val playTimeInMinutes: Int = ((data[1] - data[0]) / 60000).toInt()
+                                                val cost = costCalculator(playTimeInMinutes)
+                                                val completedTransaction = CompletedTransaction(generatedOTP.uid, data[0], playTimeInMinutes, cost)
+
+                                                dbRef.child("CompletedTransactions").child(generatedOTP.uid!!).push().setValue(completedTransaction).addOnSuccessListener {
+                                                    dbRef.child("Current").child("CurrentTransactions").child(generatedOTP.uid!!).child("active").setValue(false)
+                                                }
+                                                txt_Payment.text = cost.toString()
+                                            }
+                                        })
+                                    }
+
+                                    //removing otp from db
+                                    dbRef.child("GeneratedOTPs").child(edit_otp_home.text.toString()).removeValue()
+                                    otpList.remove(Integer.parseInt(otp))
+                                    dbRef.child("OTP_List").setValue(otpList)
+                                    edit_otp_home.setText("")
+                                } else {
+                                    Toast.makeText(activity, "Enter a valid OTP.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        })
+            }
         }
     }
 
     private fun calculateTimeDetails(uid: String?, callbackInterface: CallbackInterface<Array<Long>>) {
         dbRef.child("Current").child("CurrentTime").setValue(ServerValue.TIMESTAMP).addOnSuccessListener {
-            dbRef.child("Current").addListenerForSingleValueEvent(object : ValueEventListener{
+            dbRef.child("Current").addListenerForSingleValueEvent(object : ValueEventListener {
 
                 override fun onCancelled(p0: DatabaseError) {
                     Toast.makeText(activity, "Can't access database.", Toast.LENGTH_SHORT).show()
@@ -99,6 +110,8 @@ class HomeFragment : Fragment() {
                     timeDetails[0] = dataSnapshot.child("CurrentTransactions").child(uid!!).child("startTime_in_milliSec").value.toString().toLong()
                     timeDetails[1] = dataSnapshot.child("CurrentTime").value.toString().toLong()
                     callbackInterface.callback(timeDetails)
+
+
                 }
 
             })
