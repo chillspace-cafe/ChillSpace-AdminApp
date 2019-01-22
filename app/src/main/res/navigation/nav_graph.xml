@@ -3,28 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/dest_sign_in_admin">
+    app:startDestination="@id/dest_home">
 
     <fragment
         android:id="@+id/dest_home"
         android:name="chillspace.chillspacecafeadminapp.views.HomeFragment"
         android:label="OTP Verification"
         tools:layout="@layout/fragment_home">
-        <action
-            android:id="@+id/action_dest_home_to_dest_sign_in_admin"
-            app:destination="@id/dest_sign_in_admin"
-            app:popUpTo="@+id/dest_sign_in_admin"
-            app:popUpToInclusive="true" />
-    </fragment>
     <fragment
         android:id="@+id/dest_sign_in_admin"
         android:name="chillspace.chillspacecafeadminapp.views.SignInAdmin"
         android:label="Admin Login"
         tools:layout="@layout/fragment_sign_in_admin">
-        <action
-            android:id="@+id/action_signInAdmin_to_dest_home"
-            app:destination="@id/dest_home"
-            app:popUpTo="@+id/dest_sign_in_admin"
-            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

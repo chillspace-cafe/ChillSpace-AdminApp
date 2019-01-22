@@ -25,18 +25,26 @@ class MainActivity : AppCompatActivity() {
 
         //changing fragments when firebase auth changed
         firebaseAuth.addAuthStateListener {
-            if (firebaseAuth.currentUser != null && firebaseAuth.currentUser!!.email == EMAIL_ADMIN)
-                navController.navigate(R.id.action_signInAdmin_to_dest_home)
-
             if (firebaseAuth.currentUser == null)
-                navController.navigate(R.id.action_dest_home_to_dest_sign_in_admin)
+                navController.navigate(R.id.dest_sign_in_admin)
         }
-
 
 
         //setting title according to fragment
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             toolbar.title = navController.currentDestination?.label
+        }
+    }
+
+    //assists navigation
+    override fun onBackPressed() {
+        val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+
+        if (navController.currentDestination?.id == R.id.dest_home
+                || navController.currentDestination?.id == R.id.dest_sign_in_admin) {
+            finish()
+        } else {
+            super.onBackPressed()
         }
     }
 }

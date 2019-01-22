@@ -12,6 +12,7 @@ import chillspace.chillspacecafeadminapp.viewmodels.OTP_List_ViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import chillspace.chillspacecafeadminapp.interfaces.CallbackInterface
 import chillspace.chillspacecafeadminapp.models.CompletedTransaction
@@ -150,8 +151,9 @@ class HomeFragment : Fragment() {
     //NOTE : You may use NavigationUI if you want to navigate always to the frag with same id as menu id
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when {
-            item!!.itemId == R.id.logout_home -> FirebaseAuth.getInstance().signOut()
-            item.itemId == R.id.dest_current_transactions -> Toast.makeText(activity,"navigate to current transaction",Toast.LENGTH_SHORT).show()
+            item!!.itemId == R.id.logout_home ->
+                FirebaseAuth.getInstance().signOut()
+            item.itemId == R.id.dest_current_transactions -> Toast.makeText(activity, "navigate to current transaction", Toast.LENGTH_SHORT).show()
         }
         return super.onOptionsItemSelected(item)
     }
