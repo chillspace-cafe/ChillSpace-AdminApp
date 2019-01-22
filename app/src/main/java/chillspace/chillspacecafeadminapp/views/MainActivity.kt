@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth.addAuthStateListener {
             if (firebaseAuth.currentUser == null)
                 navController.navigate(R.id.dest_sign_in_admin)
+            if (firebaseAuth.currentUser != null && firebaseAuth.currentUser!!.email == EMAIL_ADMIN)
+                navController.navigate(R.id.dest_home)
         }
 
 

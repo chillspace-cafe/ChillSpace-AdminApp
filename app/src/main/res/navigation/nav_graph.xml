@@ -9,7 +9,7 @@
         android:id="@+id/dest_home"
         android:name="chillspace.chillspacecafeadminapp.views.HomeFragment"
         android:label="OTP Verification"
-        tools:layout="@layout/fragment_home">
+        tools:layout="@layout/fragment_home"/>
     <fragment
         android:id="@+id/dest_sign_in_admin"
         android:name="chillspace.chillspacecafeadminapp.views.SignInAdmin"
