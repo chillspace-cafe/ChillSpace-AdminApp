@@ -1,11 +1,10 @@
 package chillspace.chillspacecafeadminapp.views
 
 
+import android.app.Activity
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import chillspace.chillspacecafeadminapp.R
 import chillspace.chillspacecafeadminapp.models.CurrentTransactionAdminSide
@@ -13,9 +12,11 @@ import chillspace.chillspacecafeadminapp.viewmodels.OTP_List_ViewModel
 import kotlinx.android.synthetic.main.fragment_home.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.Navigation
 import chillspace.chillspacecafeadminapp.interfaces.CallbackInterface
 import chillspace.chillspacecafeadminapp.models.CompletedTransaction
 import chillspace.chillspacecafeadminapp.models.GeneratedOTP
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class HomeFragment : Fragment() {
@@ -29,6 +30,9 @@ class HomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        //allowing menu in toolbar
+        setHasOptionsMenu(true)
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
@@ -78,7 +82,7 @@ class HomeFragment : Fragment() {
                                                 dbRef.child("CompletedTransactions").child(generatedOTP.uid!!).push().setValue(completedTransaction).addOnSuccessListener {
                                                     dbRef.child("Current").child("CurrentTransactions").child(generatedOTP.uid!!).child("active").setValue(false)
                                                 }
-                                                txt_Payment.text = cost.toString()
+                                                txt_Payment.text = "Payable amount" + cost.toString()
                                             }
                                         })
                                     }
@@ -110,8 +114,6 @@ class HomeFragment : Fragment() {
                     timeDetails[0] = dataSnapshot.child("CurrentTransactions").child(uid!!).child("startTime_in_milliSec").value.toString().toLong()
                     timeDetails[1] = dataSnapshot.child("CurrentTime").value.toString().toLong()
                     callbackInterface.callback(timeDetails)
-
-
                 }
 
             })
@@ -137,5 +139,20 @@ class HomeFragment : Fragment() {
             }
             cost
         }
+    }
+
+    //creating menu in the toolbar
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.menu_home, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    //NOTE : You may use NavigationUI if you want to navigate always to the frag with same id as menu id
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when {
+            item!!.itemId == R.id.logout_home -> FirebaseAuth.getInstance().signOut()
+            item.itemId == R.id.dest_current_transactions -> Toast.makeText(activity,"navigate to current transaction",Toast.LENGTH_SHORT).show()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

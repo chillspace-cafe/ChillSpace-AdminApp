@@ -14,7 +14,14 @@
         android:layout_gravity="center"
         android:scaleType="fitCenter"
         android:src="@drawable/chillspacelogo" />
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chill Space Admin"
+        android:layout_gravity="center"
+        android:textStyle="italic"
+        android:layout_marginTop="10dp"
+        android:textSize="17dp"/>
     <EditText
         android:layout_marginTop="40dp"
         android:background="@drawable/textinputborder"

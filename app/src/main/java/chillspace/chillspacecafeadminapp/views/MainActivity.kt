@@ -20,10 +20,16 @@ class MainActivity : AppCompatActivity() {
         val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         val firebaseAuth = FirebaseAuth.getInstance()
 
+        //for toolbar // required for menu
+        setSupportActionBar(toolbar)
+
         //changing fragments when firebase auth changed
         firebaseAuth.addAuthStateListener {
             if (firebaseAuth.currentUser != null && firebaseAuth.currentUser!!.email == EMAIL_ADMIN)
                 navController.navigate(R.id.action_signInAdmin_to_dest_home)
+
+            if (firebaseAuth.currentUser == null)
+                navController.navigate(R.id.action_dest_home_to_dest_sign_in_admin)
         }
 
 
