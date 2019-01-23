@@ -2,15 +2,24 @@ package chillspace.chillspacecafeadminapp.views
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import chillspace.chillspacecafeadminapp.R
+import chillspace.chillspacecafeadminapp.models.CurrentTransactionClientSide
+import chillspace.chillspacecafeadminapp.models.User
+import chillspace.chillspacecafeadminapp.viewmodels.AllUsersViewModel
+import chillspace.chillspacecafeadminapp.viewmodels.CurrentTransactionViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_current_transactions.*
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         val EMAIL_ADMIN = "chillspace.irs@gmail.com"
+        var userMap = mutableMapOf<String,User>()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,8 +36,18 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth.addAuthStateListener {
             if (firebaseAuth.currentUser == null)
                 navController.navigate(R.id.dest_sign_in_admin)
-            if (firebaseAuth.currentUser != null && firebaseAuth.currentUser!!.email == EMAIL_ADMIN)
+            if (firebaseAuth.currentUser != null && firebaseAuth.currentUser!!.email == EMAIL_ADMIN) {
                 navController.navigate(R.id.dest_home)
+
+                //getting user map
+                val userMapViewModel = ViewModelProviders.of(this).get(AllUsersViewModel::class.java)
+
+                val userMapLiveData : LiveData<MutableMap<String,User>> = userMapViewModel.getUserMapLiveData()
+
+                userMapLiveData.observe(this, Observer {
+                    userMap = it
+                })
+            }
         }
 
 

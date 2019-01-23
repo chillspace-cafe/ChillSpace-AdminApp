@@ -9,11 +9,23 @@
         android:id="@+id/dest_home"
         android:name="chillspace.chillspacecafeadminapp.views.HomeFragment"
         android:label="OTP Verification"
-        tools:layout="@layout/fragment_home"/>
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_dest_home_to_dest_sign_in_admin"
+            app:destination="@id/dest_sign_in_admin" />
+        <action
+            android:id="@+id/action_dest_home_to_currentTransactions"
+            app:destination="@id/dest_current_transactions" />
+    </fragment>
     <fragment
         android:id="@+id/dest_sign_in_admin"
         android:name="chillspace.chillspacecafeadminapp.views.SignInAdmin"
         android:label="Admin Login"
         tools:layout="@layout/fragment_sign_in_admin">
     </fragment>
+    <fragment
+        android:id="@+id/dest_current_transactions"
+        android:name="chillspace.chillspacecafeadminapp.views.CurrentTransactions"
+        android:label="Current Transaction"
+        tools:layout="@layout/fragment_current_transactions" />
 </navigation>
