@@ -83,7 +83,7 @@ class HomeFragment : Fragment() {
                                                 dbRef.child("CompletedTransactions").child(generatedOTP.uid!!).push().setValue(completedTransaction).addOnSuccessListener {
                                                     dbRef.child("Current").child("CurrentTransactions").child(generatedOTP.uid!!).child("active").setValue(false)
                                                 }
-                                                txt_Payment.text = "Payable amount" + cost.toString()
+                                                txt_Payment.text = "Payable amount Rs. " + cost.toString()
                                             }
                                         })
                                     }
@@ -153,7 +153,8 @@ class HomeFragment : Fragment() {
         when {
             item!!.itemId == R.id.logout_home ->
                 FirebaseAuth.getInstance().signOut()
-            item.itemId == R.id.dest_current_transactions -> Toast.makeText(activity, "navigate to current transaction", Toast.LENGTH_SHORT).show()
+            item.itemId == R.id.dest_current_transactions ->
+                Navigation.findNavController(activity as Activity, R.id.nav_host_fragment).navigate(R.id.dest_current_transactions)
         }
         return super.onOptionsItemSelected(item)
     }
