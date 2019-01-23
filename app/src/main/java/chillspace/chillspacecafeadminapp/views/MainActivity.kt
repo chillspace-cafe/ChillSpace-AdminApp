@@ -20,17 +20,33 @@ class MainActivity : AppCompatActivity() {
         val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         val firebaseAuth = FirebaseAuth.getInstance()
 
+        //for toolbar // required for menu
+        setSupportActionBar(toolbar)
+
         //changing fragments when firebase auth changed
         firebaseAuth.addAuthStateListener {
+            if (firebaseAuth.currentUser == null)
+                navController.navigate(R.id.dest_sign_in_admin)
             if (firebaseAuth.currentUser != null && firebaseAuth.currentUser!!.email == EMAIL_ADMIN)
-                navController.navigate(R.id.action_signInAdmin_to_dest_home)
+                navController.navigate(R.id.dest_home)
         }
-
 
 
         //setting title according to fragment
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             toolbar.title = navController.currentDestination?.label
+        }
+    }
+
+    //assists navigation
+    override fun onBackPressed() {
+        val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+
+        if (navController.currentDestination?.id == R.id.dest_home
+                || navController.currentDestination?.id == R.id.dest_sign_in_admin) {
+            finish()
+        } else {
+            super.onBackPressed()
         }
     }
 }
